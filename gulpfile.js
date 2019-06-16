@@ -15,7 +15,7 @@ var include = require('posthtml-include');
 var minjs = require('gulp-uglify'); /*мініфікація js*/
 var webp = require('gulp-webp');
 var clean = require('gulp-clean');
-
+var htmlmin = require('gulp-htmlmin');
 
 
 gulp.task('clean', function () {
@@ -24,16 +24,7 @@ gulp.task('clean', function () {
 });
 
 
-/*інлайнить svg в html документи
-  <div style="display: none">
-    <include src="img/sprite.svg"></include>  
-  </div>
-*/
-gulp.task('phtml', function() {
-  return gulp.src('*.html')
-    .pipe(posthtml([include()]))
-    .pipe(gulp.dest('client/')) 
-});
+
 
 /**/
 gulp.task('sass', function() {
@@ -96,6 +87,23 @@ gulp.task('webp', function() {
         .pipe(gulp.dest('img'))
 });
 
+/*інлайнить svg в html документи
+  <div style="display: none">
+    <include src="img/sprite.svg"></include>  
+  </div>
+*/
+gulp.task('phtml', function() {
+  return gulp.src('*.html')
+    .pipe(posthtml([include()]))
+    .pipe(gulp.dest('client/')) 
+});
+
+gulp.task('minhtml', () => {
+  return gulp.src('client/*.html')
+    .pipe(htmlmin({ collapseWhitespace: true }))
+    .pipe(gulp.dest('client/'));
+});
+
 
 
 
@@ -110,7 +118,7 @@ gulp.task('webp', function() {
 /*копіювання тільки необхідних файлів в потрібну папку для передачі клієнту*/
 gulp.task('copy', function() {                 
     return gulp.src([
-      "fonts/*.ttf",
+      "fonts/*.{ttf,woff,woff2}",
       "img/**",
       "js/*.js",
       "css/*.css",
@@ -122,7 +130,7 @@ gulp.task('copy', function() {
 });
 
 /*запуск task один за одним: очищення, копіювання, перетворення в css, автопрефікси, мініфікація js, спрайт svg, мініфікація зображень, інлайн svg в html*/
-gulp.task('develop', gulp.series('clean', 'copy', 'sass', 'minjs', 'images', 'phtml')); 
+gulp.task('develop', gulp.series('clean', 'copy', 'sass', 'minjs', 'images', 'phtml', 'minhtml')); 
 
 
 
